@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Boxi
+StartupNotify=true
+DBusActivatable=true
+Exec=python3 -m boxi

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["flit_core >=3.7,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "boxi"
+authors = [{name = "Allison Karlitskaya", email = "allison.karlitskaya@redhat.com"}]
+readme = "README.md"
+license = {file = "COPYING"}
+classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
+dynamic = ["version", "description"]
+
+[project.urls]
+Home = "https://github.com/allisonkarlitskaya/boxi/"
+
+[project.scripts]
+boxi = "boxi.__main__:main"
+
+[tool.flit.external-data]
+directory = "data"

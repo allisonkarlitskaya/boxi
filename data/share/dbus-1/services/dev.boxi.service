@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=dev.boxi
+Exec=python3 -m boxi.app --gapplication-service
