@@ -30,19 +30,22 @@ class Session(threading.Thread):
         self.connection = connection
 
     def run(self):
-        command = json.loads(self.connection.recv(10000))
+        msg, fds, flags, addr = socket.recv_fds(self.connection, 10000, 1)
+        command = json.loads(msg)
         theirs, ours = pty.openpty()
         socket.send_fds(self.connection, [b'"pty"'], [theirs])
         os.close(theirs)
 
         result = subprocess.run(command,
                 check=False, start_new_session=True,
-                stdin=ours, stdout=ours, stderr=ours,
-                preexec_fn=lambda: fcntl.ioctl(0, termios.TIOCSCTTY, 0))
+                stdin=fds[0] if fds else ours, stdout=ours, stderr=ours,
+                preexec_fn=lambda: fcntl.ioctl(1, termios.TIOCSCTTY, 0))
 
         self.connection.send(json.dumps(result.returncode).encode('ascii'))
         self.connection.close()
         os.close(ours)
+        for fd in fds:
+            os.close(fd)
 
 
 def socket_from_fd(fd):
