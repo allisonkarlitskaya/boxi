@@ -45,6 +45,7 @@ class Session(threading.Thread):
         os.close(theirs)
 
         result = subprocess.run(command,
+                env=dict(os.environ, TERM='xterm-256color'),
                 check=False, start_new_session=True,
                 stdin=fds[0] if fds else ours, stdout=ours, stderr=ours,
                 preexec_fn=lambda: fcntl.ioctl(1, termios.TIOCSCTTY, 0))
