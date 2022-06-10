@@ -37,7 +37,7 @@ from . import APP_ID, IS_FLATPAK, PKG_DIR
 
 
 class Agent:
-    def __init__(self, container):
+    def __init__(self, container=None):
         self.container = container
         self.connection, theirs = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
         their_fd = theirs.fileno()
@@ -47,11 +47,15 @@ class Agent:
             os.dup2(their_fd, 3)
             os.close(their_fd)
 
+        if container:
+            cmd = [sys.executable, f'{PKG_DIR}/toolbox_run.py', container, '--', '/usr/bin/python3']
+        elif IS_FLATPAK:
+            cmd = ['flatpak-spawn', '--host', '--forward-fd=3', '/usr/bin/python3']
+        else:
+            cmd = [sys.executable]
+
         with open(f'{PKG_DIR}/agent.py', 'rb') as agent_py:
-            subprocess.Popen([sys.executable, f'{PKG_DIR}/toolbox_run.py', container, '--', '/usr/bin/python3'],
-                    stdin=agent_py,
-                    pass_fds=[3],
-                    preexec_fn=dup2_3_and_close_theirs)
+            subprocess.Popen(cmd, stdin=agent_py, pass_fds=[3], preexec_fn=dup2_3_and_close_theirs)
 
         theirs.close()
 
@@ -69,7 +73,10 @@ class Session:
         self.listener = listener
         GLib.unix_fd_add_full(0, self.connection.fileno(), GLib.IOCondition.IN, Session.ready, self)
 
-    def send_command(self, command):
+    def start_shell(self):
+        self.connection.send(b'[]')
+
+    def start_command(self, command):
         self.connection.send(json.dumps(command).encode('utf-8'))
 
     def open_editor(self):
@@ -131,7 +138,10 @@ class Window(Gtk.ApplicationWindow):
         super().__init__(application=application)
         self.command_line = command_line
         header = Gtk.HeaderBar()
-        header.set_title(f'Boxi ({application.agent.container})')
+        if application.container:
+            header.set_title(f'Boxi ({application.container})')
+        else:
+            header.set_title(f'Boxi')
         header.set_show_close_button(True)
         self.set_titlebar(header)
         self.terminal = Terminal()
@@ -161,7 +171,7 @@ class Window(Gtk.ApplicationWindow):
 
     def new_window(self, *_args):
         window = Window(self.get_application())
-        window.session.send_command([])
+        window.session.start_shell()
         window.show_all()
 
     def edit_contents(self, *_args):
@@ -183,34 +193,56 @@ class Window(Gtk.ApplicationWindow):
         factors = {'in': current * 1.2, 'default': 1.0, 'out': current * 0.8}
         self.terminal.set_font_scale(factors[parameter.get_string()])
 
+
 class Application(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id=APP_ID, flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
-        Handy.StyleManager.get_default().set_color_scheme(Handy.ColorScheme.PREFER_LIGHT)
+        super().__init__(flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
 
-    def create_agent(self):
-        # A rough heuristic to find a reasonable container to run, until we get something better
-        cmd = [
-            *(['flatpak-spawn', '--host'] if IS_FLATPAK else []),
-            'podman', 'container', 'list',
-            '--filter', 'label=com.github.containers.toolbox',
-            '--format', '{{.Names}}'
-        ]
+        self.add_option('version', description='Show version')
+        self.add_option('container', 'c', arg=GLib.OptionArg.STRING, description='Toolbox container name')
+        self.add_option('', arg=GLib.OptionArg.STRING_ARRAY, arg_description='COMMAND ARGS ...')
 
-        # Prefer running containers, then check all.
-        output = subprocess.check_output(cmd, text=True)
-        if not output:
-            cmd.append('--all')
-            output = subprocess.check_output(cmd, text=True)
+    def add_option(self, long_name, short_name=None, flags=GLib.OptionFlags.NONE,
+            arg=GLib.OptionArg.NONE, description='', arg_description=None):
+        short_char = ord(short_name) if short_name is not None else 0
+        self.add_main_option(long_name, short_char, flags, arg, description, arg_description)
 
-        if not output:
-            sys.exit("Can't decide which container to run")
+    def do_handle_local_options(self, options):
+        if options.contains('version'):
+            from . import __version__ as version
+            print(f'Boxi {version}')
+            return 0
 
-        container = output.split('\n')[0]
-        self.agent = Agent(container)
+        if options.contains('container'):
+            self.container = options.lookup_value('container').get_string()
+            self.set_application_id(f'{APP_ID}.{self.container}')
+        else:
+            self.set_application_id(APP_ID)
+            self.container = None
+
+        # Ideally, GApplication would have a flag for this, but it's a little
+        # bit magic.  In case `--gapplication-service` wasn't given, we want to
+        # first try to become a launcher.  If that fails then we fall back to
+        # the standard hybrid mode where we might end up as the primary or
+        # remote instance.  This allows the benefits of being a launcher (more
+        # consistent commandline behaviour) opportunistically, without breaking
+        # the partially-installed case.
+        flags = self.get_flags()
+        if not flags & Gio.ApplicationFlags.IS_SERVICE:
+            try:
+                self.set_flags(flags | Gio.ApplicationFlags.IS_LAUNCHER)
+                self.register()
+            except GLib.Error:
+                # didn't work?  Put it back.
+                self.set_flags(flags)
+
+        return -1
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
+
+        Handy.StyleManager.get_default().set_color_scheme(Handy.ColorScheme.PREFER_LIGHT)
+
         self.set_accels_for_action("win.new-window", ["<Ctrl><Shift>N"])
         self.set_accels_for_action("win.edit-contents", ["<Ctrl><Shift>S"])
         self.set_accels_for_action("win.copy", ["<Ctrl><Shift>C"])
@@ -218,20 +250,27 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.zoom::default", ["<Ctrl>0"])
         self.set_accels_for_action("win.zoom::in", ["<Ctrl>equal", "<Ctrl>plus"])
         self.set_accels_for_action("win.zoom::out", ["<Ctrl>minus"])
-        self.create_agent()
+
+        self.agent = Agent(self.container)
 
     def do_command_line(self, command_line):
+        options = command_line.get_options_dict()
+        argv = options.lookup_value('')
+
         window = Window(self, command_line)
-        window.session.send_command(command_line.get_arguments()[1:])
+        if argv:
+            window.session.start_command(argv.get_strv())
+        else:
+            window.session.start_shell()
         window.show_all()
-        return 0
+
+        return -1  # real return value comes later
 
     def do_activate(self):
         window = Window(self)
-        window.session.send_command([])
+        window.session.start_shell()
         window.show_all()
 
 
-if __name__ == '__main__':
-    app = Application()
-    sys.exit(app.run(sys.argv))
+def main():
+    sys.exit(Application().run(sys.argv))

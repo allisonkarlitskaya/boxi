@@ -14,7 +14,7 @@ dynamic = ["version", "description"]
 Home = "https://github.com/allisonkarlitskaya/boxi/"
 
 [project.scripts]
-boxi = "boxi.__main__:main"
+boxi = "boxi.app:main"
 
 [tool.flit.external-data]
 directory = "data"

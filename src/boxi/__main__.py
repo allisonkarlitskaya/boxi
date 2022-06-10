@@ -19,17 +19,10 @@ import sys
 
 from gi.repository import GLib
 
-def main():
-    try:
-        from .client import Application
-        app = Application()
-        app.register()
-    except GLib.Error:
-        from .app import Application
-        app = Application()
+from .app import main
 
-    sys.exit(app.run(sys.argv))
+if __package__:
+    sys.argv[0] = f'python3 -m boxi'
+    GLib.set_prgname(sys.argv[0])
 
-
-if __name__ == '__main__':
-    main()
+main()
