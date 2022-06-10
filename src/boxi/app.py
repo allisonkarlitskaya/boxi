@@ -130,6 +130,12 @@ class Window(Gtk.ApplicationWindow):
         self.session = application.agent.create_session(self)
         self.add(self.terminal)
         self.terminal.connect('eof', self.session_eof)
+        Gio.ActionMap.add_action_entries(self, [
+            ('new-window', self.new_window),
+            ('copy', self.copy),
+            ('paste', self.paste),
+            ('zoom', self.zoom, 's'),
+        ])
 
     def session_created(self, pty):
         self.terminal.set_pty(pty)
@@ -143,6 +149,21 @@ class Window(Gtk.ApplicationWindow):
     def session_eof(self, terminal):
         self.destroy()
 
+    def new_window(self, *_args):
+        window = Window(self.get_application())
+        window.session.send_command([])
+        window.show_all()
+
+    def copy(self, *_args):
+        self.terminal.copy_clipboard_format(Vte.Format.TEXT)
+
+    def paste(self, *_args):
+        self.terminal.paste_clipboard()
+
+    def zoom(self, action, parameter, *_args):
+        current = self.terminal.get_font_scale()
+        factors = {'in': current * 1.2, 'default': 1.0, 'out': current * 0.8}
+        self.terminal.set_font_scale(factors[parameter.get_string()])
 
 class Application(Gtk.Application):
     def __init__(self):
@@ -171,6 +192,12 @@ class Application(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
+        self.set_accels_for_action("win.new-window", ["<Ctrl><Shift>N"])
+        self.set_accels_for_action("win.copy", ["<Ctrl><Shift>C"])
+        self.set_accels_for_action("win.paste", ["<Ctrl><Shift>V"])
+        self.set_accels_for_action("win.zoom::default", ["<Ctrl>0"])
+        self.set_accels_for_action("win.zoom::in", ["<Ctrl>equal", "<Ctrl>plus"])
+        self.set_accels_for_action("win.zoom::out", ["<Ctrl>minus"])
         self.create_agent()
 
     def do_command_line(self, command_line):
