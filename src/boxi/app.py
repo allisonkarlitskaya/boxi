@@ -32,8 +32,6 @@ gi.require_version('Vte', '2.91')
 from gi.repository import GLib
 from gi.repository import Gdk, Gio, Gtk, Handy, Vte
 
-sys.dont_write_bytecode = True
-
 from .adwaita_palette import ADWAITA_PALETTE
 
 
