@@ -47,10 +47,11 @@ class Agent:
             os.dup2(their_fd, 3)
             os.close(their_fd)
 
-        subprocess.Popen([sys.executable, f'{PKG_DIR}/toolbox_run.py', container, '--', '/usr/bin/python3', '-m', 'boxi.agent'],
-                stdin=subprocess.DEVNULL,
-                pass_fds=[3],
-                preexec_fn=dup2_3_and_close_theirs)
+        with open(f'{PKG_DIR}/agent.py', 'rb') as agent_py:
+            subprocess.Popen([sys.executable, f'{PKG_DIR}/toolbox_run.py', container, '--', '/usr/bin/python3'],
+                    stdin=agent_py,
+                    pass_fds=[3],
+                    preexec_fn=dup2_3_and_close_theirs)
 
         theirs.close()
 
