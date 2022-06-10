@@ -94,6 +94,11 @@ class Session:
 
 
 class Terminal(Vte.Terminal):
+    def __init__(self):
+        super().__init__()
+        self.set_audible_bell(False)
+        self.set_scrollback_lines(-1)
+
     @staticmethod
     def parse_color(color):
         rgba = Gdk.RGBA()
