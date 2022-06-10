@@ -33,7 +33,7 @@ from gi.repository import GLib
 from gi.repository import Gdk, Gio, Gtk, Handy, Vte
 
 from .adwaita_palette import ADWAITA_PALETTE
-from . import APP_ID, PKG_DIR
+from . import APP_ID, IS_FLATPAK, PKG_DIR
 
 
 class Agent:
@@ -191,6 +191,7 @@ class Application(Gtk.Application):
     def create_agent(self):
         # A rough heuristic to find a reasonable container to run, until we get something better
         cmd = [
+            *(['flatpak-spawn', '--host'] if IS_FLATPAK else []),
             'podman', 'container', 'list',
             '--filter', 'label=com.github.containers.toolbox',
             '--format', '{{.Names}}'

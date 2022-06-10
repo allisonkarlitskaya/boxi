@@ -21,5 +21,6 @@ import os
 
 __version__ = "0"
 
-APP_ID = 'dev.boxi'
+IS_FLATPAK = os.path.exists('/.flatpak-info')
+APP_ID = IS_FLATPAK and os.environ.get('FLATPAK_ID') or 'dev.boxi'
 PKG_DIR = os.path.dirname(__file__)

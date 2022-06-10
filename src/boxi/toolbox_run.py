@@ -2,6 +2,8 @@ import argparse
 import subprocess
 import os
 
+from boxi import IS_FLATPAK
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('container')
@@ -11,11 +13,17 @@ def main():
     # We do this first, for two reasons:
     #   - give toolbox a chance to start the container if it's not running
     #   - get the exact environment that toolbox would have sent in
-    env = subprocess.check_output(['toolbox', 'run', '--container', args.container, 'env', '-0'],
-            stdin=subprocess.DEVNULL)
+    cmd = [
+        *(['flatpak-spawn', '--host'] if IS_FLATPAK else []),
+        'toolbox', 'run',
+        '--container', args.container,
+        'env', '-0'
+    ]
+    env = subprocess.check_output(cmd, stdin=subprocess.DEVNULL)
     env_args = [b'--env=' + key_val for key_val in env.split(b'\0') if key_val]
 
-    os.execvp('podman', [
+    cmd = [
+        *(['flatpak-spawn', '--host', '--forward-fd=3'] if IS_FLATPAK else []),
         'podman', 'exec',
 
         '--interactive',
@@ -32,7 +40,8 @@ def main():
         'capsh', '--caps=', '--', '-c', 'exec "$@"', '/bin/bash',
 
         *args.cmd
-    ])
+    ]
+    os.execvp(cmd[0], cmd)
 
 
 if __name__ == '__main__':
