@@ -17,7 +17,7 @@
 
 import json
 import os
-import pty
+import signal
 import socket
 import subprocess
 import sys
@@ -273,4 +273,6 @@ class Application(Gtk.Application):
 
 
 def main():
+    signal.signal(signal.SIGCHLD, signal.SIG_IGN)  # because we don't clean up after the agent
+    signal.signal(signal.SIGINT, signal.SIG_DFL)  # because KeyboardInterrupt doesn't work with gmain
     sys.exit(Application().run(sys.argv))
