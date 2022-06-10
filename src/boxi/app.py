@@ -73,6 +73,11 @@ class Session:
     def send_command(self, command):
         self.connection.send(json.dumps(command).encode('utf-8'))
 
+    def open_editor(self):
+        reader, writer = os.pipe()
+        socket.send_fds(self.connection, [b'["vi", "-"]'], [reader])
+        return Gio.UnixOutputStream.new(writer, True)
+
     @staticmethod
     def ready(fd, _condition, self):
         msg, fds, _flags, _addr = socket.recv_fds(self.connection, 10000, 1)
@@ -137,6 +142,7 @@ class Window(Gtk.ApplicationWindow):
         self.terminal.connect('eof', self.session_eof)
         Gio.ActionMap.add_action_entries(self, [
             ('new-window', self.new_window),
+            ('edit-contents', self.edit_contents),
             ('copy', self.copy),
             ('paste', self.paste),
             ('zoom', self.zoom, 's'),
@@ -158,6 +164,14 @@ class Window(Gtk.ApplicationWindow):
         window = Window(self.get_application())
         window.session.send_command([])
         window.show_all()
+
+    def edit_contents(self, *_args):
+        window = Window(self.get_application())
+        window.show_all()
+
+        stream = window.session.open_editor()
+        self.terminal.write_contents_sync(stream, Vte.WriteFlags.DEFAULT, None)
+        stream.close()
 
     def copy(self, *_args):
         self.terminal.copy_clipboard_format(Vte.Format.TEXT)
@@ -198,6 +212,7 @@ class Application(Gtk.Application):
     def do_startup(self):
         Gtk.Application.do_startup(self)
         self.set_accels_for_action("win.new-window", ["<Ctrl><Shift>N"])
+        self.set_accels_for_action("win.edit-contents", ["<Ctrl><Shift>S"])
         self.set_accels_for_action("win.copy", ["<Ctrl><Shift>C"])
         self.set_accels_for_action("win.paste", ["<Ctrl><Shift>V"])
         self.set_accels_for_action("win.zoom::default", ["<Ctrl>0"])
