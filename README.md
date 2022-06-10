@@ -25,7 +25,7 @@ By default, Boxi will create sessions on the host system.  If you'd like to crea
 boxi -c f36
 ```
 
-Boxi uses different application identifiers when it is run for different containers.  This allows creating individual launcher icons for each container.  For example, `~/.local/share/applications/dev.boxi.f36.desktop':
+Boxi uses different application identifiers when it is run for different containers.  This allows creating individual launcher icons for each container.  For example, `~/.local/share/applications/dev.boxi.f36.desktop`:
 
 ```
 [Desktop Entry]
