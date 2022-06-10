@@ -74,7 +74,7 @@ class Session:
         self.connection.send(json.dumps(command).encode('utf-8'))
 
     @staticmethod
-    def ready(fd, condition, self):
+    def ready(fd, _condition, self):
         msg, fds, _flags, _addr = socket.recv_fds(self.connection, 10000, 1)
         if not msg:
             self.listener.session_eof(None)
