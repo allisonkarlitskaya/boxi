@@ -56,14 +56,12 @@ class Agent:
 
         theirs.close()
 
-    def create_session(self, listener, command):
+    def create_session(self, listener):
         ours, theirs = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
         socket.send_fds(self.connection, [b' '], [theirs.fileno()])
         theirs.close()
 
-        session = Session(ours, listener)
-        session.send_command(command)
-        return session
+        return Session(ours, listener)
 
 
 class Session:
@@ -128,7 +126,7 @@ class Window(Gtk.ApplicationWindow):
         self.set_titlebar(header)
         self.terminal = Terminal()
         self.terminal.set_size(120, 48)
-        self.session = application.agent.create_session(self, ['/usr/bin/fish'])
+        self.session = application.agent.create_session(self)
         self.add(self.terminal)
         self.terminal.connect('eof', self.session_eof)
 
@@ -175,11 +173,15 @@ class Application(Gtk.Application):
         self.create_agent()
 
     def do_command_line(self, command_line):
-        Window(self, command_line).show_all()
+        window = Window(self, command_line)
+        window.session.send_command(command_line.get_arguments()[1:])
+        window.show_all()
         return 0
 
     def do_activate(self):
-        Window(self).show_all()
+        window = Window(self)
+        window.session.send_command([])
+        window.show_all()
 
 
 if __name__ == '__main__':
