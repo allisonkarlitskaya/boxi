@@ -70,8 +70,28 @@ def accept(listener):
     return socket_from_fd(fd)
 
 
+def daemon():
+    if os.fork() != 0:
+        os._exit(0)
+
+    fd = os.open('/dev/null', os.O_RDWR)
+    os.dup2(fd, 0)
+    os.dup2(fd, 1)
+    os.dup2(fd, 2)
+    # leave 3 alone
+    os.closerange(4, -1)
+
+    os.setsid()
+
+    if os.fork() != 0:
+        os._exit(0)
+
+
 def main():
+    daemon()
+
     listener = socket_from_fd(3)
+
     while connection := accept(listener):
         Session(connection).start()
 
