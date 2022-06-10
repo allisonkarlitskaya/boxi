@@ -19,6 +19,7 @@ import fcntl
 import json
 import os
 import pty
+import pwd
 import socket
 import subprocess
 import termios
@@ -32,6 +33,13 @@ class Session(threading.Thread):
     def run(self):
         msg, fds, flags, addr = socket.recv_fds(self.connection, 10000, 1)
         command = json.loads(msg)
+
+        if not command:
+            try:
+                command = [pwd.getpwuid(os.getuid()).pw_shell]
+            except (OSError, KeyError):
+                command = ['/bin/sh']
+
         theirs, ours = pty.openpty()
         socket.send_fds(self.connection, [b'"pty"'], [theirs])
         os.close(theirs)
