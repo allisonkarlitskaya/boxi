@@ -17,4 +17,9 @@
 
 "Boxi"
 
+import os
+
 __version__ = "0"
+
+APP_ID = 'dev.boxi'
+PKG_DIR = os.path.dirname(__file__)

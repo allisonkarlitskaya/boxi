@@ -33,6 +33,7 @@ from gi.repository import GLib
 from gi.repository import Gdk, Gio, Gtk, Handy, Vte
 
 from .adwaita_palette import ADWAITA_PALETTE
+from . import APP_ID, PKG_DIR
 
 
 class Agent:
@@ -46,8 +47,7 @@ class Agent:
             os.dup2(their_fd, 3)
             os.close(their_fd)
 
-        toolbox_run = os.path.realpath(f'{__file__}/../toolbox_run.py')
-        subprocess.Popen([sys.executable, toolbox_run, container, '--', '/usr/bin/python3', '-m', 'boxi.agent'],
+        subprocess.Popen([sys.executable, f'{PKG_DIR}/toolbox_run.py', container, '--', '/usr/bin/python3', '-m', 'boxi.agent'],
                 stdin=subprocess.DEVNULL,
                 pass_fds=[3],
                 preexec_fn=dup2_3_and_close_theirs)
@@ -184,7 +184,7 @@ class Window(Gtk.ApplicationWindow):
 
 class Application(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id='dev.boxi', flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
+        super().__init__(application_id=APP_ID, flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
         Handy.StyleManager.get_default().set_color_scheme(Handy.ColorScheme.PREFER_LIGHT)
 
     def create_agent(self):

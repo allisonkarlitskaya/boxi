@@ -19,9 +19,11 @@ import sys
 
 from gi.repository import GLib, Gio
 
+from . import APP_ID
+
 class Application(Gio.Application):
     def __init__(self):
-        super().__init__(application_id='dev.boxi',
+        super().__init__(application_id=APP_ID,
                 flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE | Gio.ApplicationFlags.IS_LAUNCHER)
 
 
