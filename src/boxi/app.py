@@ -123,6 +123,7 @@ class Window(Gtk.ApplicationWindow):
         self.command_line = command_line
         header = Gtk.HeaderBar()
         header.set_title(f'Boxi ({application.agent.container})')
+        header.set_show_close_button(True)
         self.set_titlebar(header)
         self.terminal = Terminal()
         self.terminal.set_size(120, 48)
