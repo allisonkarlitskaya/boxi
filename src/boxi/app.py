@@ -35,6 +35,10 @@ from gi.repository import Gdk, Gio, Gtk, Handy, Vte
 from .adwaita_palette import ADWAITA_PALETTE
 from . import APP_ID, IS_FLATPAK, PKG_DIR
 
+VTE_NUMERIC_VERSION = 10000 * Vte.MAJOR_VERSION + 100 * Vte.MINOR_VERSION + Vte.MICRO_VERSION
+VTE_TERMINFO_NAME = "xterm-256color"
+VTE_ENV = {'TERM': VTE_TERMINFO_NAME, 'VTE_VERSION': f'{VTE_NUMERIC_VERSION}'}
+
 
 class Agent:
     def __init__(self, container=None):
@@ -73,15 +77,18 @@ class Session:
         self.listener = listener
         GLib.unix_fd_add_full(0, self.connection.fileno(), GLib.IOCondition.IN, Session.ready, self)
 
-    def start_shell(self):
-        self.connection.send(b'[]')
+    def start_command(self, command, fds=()):
+        message = {"args": command, "env": VTE_ENV}
+        socket.send_fds(self.connection, [json.dumps(message).encode('utf-8')], fds)
+        for fd in fds:
+            os.close(fd)
 
-    def start_command(self, command):
-        self.connection.send(json.dumps(command).encode('utf-8'))
+    def start_shell(self):
+        self.start_command([])
 
     def open_editor(self):
         reader, writer = os.pipe()
-        socket.send_fds(self.connection, [b'["vi", "-"]'], [reader])
+        self.start_command(['vi', '-'], [reader])
         return Gio.UnixOutputStream.new(writer, True)
 
     @staticmethod

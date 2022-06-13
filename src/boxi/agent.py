@@ -32,20 +32,21 @@ class Session(threading.Thread):
 
     def run(self):
         msg, fds, flags, addr = socket.recv_fds(self.connection, 10000, 1)
-        command = json.loads(msg)
+        message = json.loads(msg)
+        args = message.get('args')
+        env = message.get('env')
 
-        if not command:
+        if not args:
             try:
-                command = [pwd.getpwuid(os.getuid()).pw_shell]
+                args = [pwd.getpwuid(os.getuid()).pw_shell]
             except (OSError, KeyError):
-                command = ['/bin/sh']
+                args = ['/bin/sh']
 
         theirs, ours = pty.openpty()
         socket.send_fds(self.connection, [b'"pty"'], [theirs])
         os.close(theirs)
 
-        result = subprocess.run(command,
-                env=dict(os.environ, TERM='xterm-256color'),
+        result = subprocess.run(args, env=dict(os.environ, **env),
                 check=False, start_new_session=True,
                 stdin=fds[0] if fds else ours, stdout=ours, stderr=ours,
                 preexec_fn=lambda: fcntl.ioctl(1, termios.TIOCSCTTY, 0))
