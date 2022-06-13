@@ -143,7 +143,7 @@ class Terminal(Vte.Terminal):
     @staticmethod
     def parse_color(color):
         rgba = Gdk.RGBA()
-        rgba.parse(color if color.startswith('#') else ADWAITA_PALETTE[color])
+        rgba.parse(color if color.startswith('#') or color.startswith('rgb') else ADWAITA_PALETTE[color])
         return rgba
 
     def set_palette(self, fg=None, bg=None, palette=()):
@@ -154,11 +154,11 @@ class Terminal(Vte.Terminal):
     def do_style_updated(self):
         # See https://gitlab.gnome.org/Teams/Design/hig-www/-/issues/129 and
         # https://gitlab.gnome.org/Teams/Design/HIG-app-icons/-/commit/4e1dfe95748a6ee80cc9c0e6c40a891c0f4d534c
-        palette = ['dark_4', 'red_4', 'green_4', 'yellow_4', 'blue_4', 'purple_4', '#0a8dcb', 'light_4',
+        palette = ['dark_4', 'red_4', 'green_4', 'yellow_4', 'blue_4', 'purple_4', '#0aa8dc', 'light_4',
                    'dark_2', 'red_2', 'green_2', 'yellow_2', 'blue_2', 'purple_2', '#4fd2fd', 'light_2']
 
         if Handy.StyleManager.get_default().get_dark():
-            self.set_palette('light_1', 'dark_5', palette)
+            self.set_palette('light_1', 'rgb(5%, 5%, 5%)', palette)
         else:
             self.set_palette('dark_5', 'light_1', palette)
 
