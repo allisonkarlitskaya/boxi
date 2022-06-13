@@ -35,6 +35,7 @@ class Session(threading.Thread):
         message = json.loads(msg)
         args = message.get('args')
         env = message.get('env')
+        cwd = message.get('cwd')
 
         if not args:
             try:
@@ -46,7 +47,7 @@ class Session(threading.Thread):
         socket.send_fds(self.connection, [b'"pty"'], [theirs])
         os.close(theirs)
 
-        result = subprocess.run(args, env=dict(os.environ, **env),
+        result = subprocess.run(args, env=dict(os.environ, **env), cwd=cwd,
                 check=False, start_new_session=True,
                 stdin=fds[0] if fds else ours, stdout=ours, stderr=ours,
                 preexec_fn=lambda: fcntl.ioctl(1, termios.TIOCSCTTY, 0))

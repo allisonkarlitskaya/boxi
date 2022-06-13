@@ -84,14 +84,14 @@ class Session:
         self.listener = listener
         GLib.unix_fd_add_full(0, self.connection.fileno(), GLib.IOCondition.IN, Session.ready, self)
 
-    def start_command(self, command, fds=()):
-        message = {"args": command, "env": VTE_ENV}
+    def start_command(self, command, cwd=None, fds=()):
+        message = {"args": command, "cwd": cwd, "env": VTE_ENV}
         socket.send_fds(self.connection, [json.dumps(message).encode('utf-8')], fds)
         for fd in fds:
             os.close(fd)
 
-    def start_shell(self):
-        self.start_command([])
+    def start_shell(self, cwd=None):
+        self.start_command([], cwd=cwd)
 
     def open_editor(self):
         reader, writer = os.pipe()
@@ -209,7 +209,7 @@ class Window(Gtk.ApplicationWindow):
 
     def new_window(self, *_args):
         window = Window(self.get_application())
-        window.session.start_shell()
+        window.session.start_shell(cwd=self.cwd)
         window.show_all()
 
     def edit_contents(self, *_args):
