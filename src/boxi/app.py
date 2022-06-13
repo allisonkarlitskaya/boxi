@@ -95,7 +95,7 @@ class Session:
 
     def open_editor(self):
         reader, writer = os.pipe()
-        self.start_command(['vi', '-'], [reader])
+        self.start_command(['vi', '-'], fds=[reader])
         return Gio.UnixOutputStream.new(writer, True)
 
     @staticmethod
