@@ -164,7 +164,7 @@ class Terminal(Vte.Terminal):
 
 
 class Window(Gtk.ApplicationWindow):
-    def __init__(self, application, command_line=None):
+    def __init__(self, application, command_line=None, path=None):
         super().__init__(application=application)
         self.command_line = command_line
         header = Gtk.HeaderBar()
@@ -175,6 +175,9 @@ class Window(Gtk.ApplicationWindow):
         self.session = application.agent.create_session(self)
         self.add(self.terminal)
         self.terminal.connect('eof', self.session_eof)
+        self.file = None
+        self.path = path
+        self.cwd = None
         Gio.ActionMap.add_action_entries(self, [
             ('new-window', self.new_window),
             ('edit-contents', self.edit_contents),
@@ -192,7 +195,7 @@ class Window(Gtk.ApplicationWindow):
         self.cwd = cwd_uri and urllib.parse.urlparse(cwd_uri).path
         file_uri = self.terminal.get_current_file_uri()
         self.file = file_uri and urllib.parse.urlparse(file_uri).path
-        title = ['Boxi', self.get_application().container, self.file or self.cwd]
+        title = ['Boxi', self.get_application().container, self.path or self.file or self.cwd]
         self.set_title(' : '.join(text for text in title if text))
 
     def session_created(self, pty):
@@ -209,7 +212,7 @@ class Window(Gtk.ApplicationWindow):
 
     def new_window(self, *_args):
         window = Window(self.get_application())
-        window.session.start_shell(cwd=self.cwd)
+        window.session.start_shell(cwd=self.cwd or self.path and os.path.dirname(self.path))
         window.show_all()
 
     def edit_contents(self, *_args):
@@ -234,11 +237,12 @@ class Window(Gtk.ApplicationWindow):
 
 class Application(Gtk.Application):
     def __init__(self):
-        super().__init__(flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
+        super().__init__(flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE | Gio.ApplicationFlags.HANDLES_OPEN)
 
         self.add_option('non-unique', description='Disable GApplication uniqueness')
         self.add_option('version', description='Show version')
         self.add_option('container', 'c', arg=GLib.OptionArg.STRING, description='Toolbox container name')
+        self.add_option('edit', description='Treat arguments as filenames to edit')
         self.add_option('', arg=GLib.OptionArg.STRING_ARRAY, arg_description='COMMAND ARGS ...')
 
     def add_option(self, long_name, short_name=None, flags=GLib.OptionFlags.NONE,
@@ -296,16 +300,42 @@ class Application(Gtk.Application):
 
     def do_command_line(self, command_line):
         options = command_line.get_options_dict()
-        argv = options.lookup_value('')
+        args = options.lookup_value('')
 
-        window = Window(self, command_line)
-        if argv:
-            window.session.start_command(argv.get_strv())
+        if options.contains('edit'):
+            if args:
+                for arg in args.get_strv():
+                    self.open_file(command_line.create_file_for_arg(arg))
+            else:
+                self.do_activate()
+
+            return 0
         else:
-            window.session.start_shell()
-        window.show_all()
+            window = Window(self, command_line)
+            if args:
+                window.session.start_command(args.get_strv())
+            else:
+                window.session.start_shell()
+            window.show_all()
 
-        return -1  # real return value comes later
+            return -1  # real return value comes later
+
+    def do_open(self, files, n_files, hint):
+        for file in files:
+            self.open_file(file)
+
+    def open_file(self, file):
+        path = file.get_path()
+        for window in self.get_windows():
+            if window.path == path:
+                break
+        else:
+            window = Window(self, path=path)
+            window.session.start_command(['vi', path])
+            window.show_all()
+
+        window.present()
+
 
     def do_activate(self):
         window = Window(self)

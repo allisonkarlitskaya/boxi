@@ -3,4 +3,5 @@ Type=Application
 Name=Boxi
 StartupNotify=true
 DBusActivatable=true
-Exec=boxi
+MimeType=text/plain
+Exec=boxi --edit %F
