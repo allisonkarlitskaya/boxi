@@ -58,6 +58,12 @@ class Agent:
         else:
             cmd = [sys.executable]
 
+        # `python3` in `ps` output isn't so helpful, so add some extra args
+        if container:
+            cmd.extend(['-', 'Boxi agent for container', container])
+        else:
+            cmd.extend(['-', 'Boxi agent for host'])
+
         with open(f'{PKG_DIR}/agent.py', 'rb') as agent_py:
             subprocess.Popen(cmd, stdin=agent_py, pass_fds=[3], preexec_fn=dup2_3_and_close_theirs)
 
