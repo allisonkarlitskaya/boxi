@@ -122,6 +122,22 @@ class Terminal(Vte.Terminal):
         super().__init__()
         self.set_audible_bell(False)
         self.set_scrollback_lines(-1)
+        regex = Vte.Regex.new_for_match(r'https?://[-A-Za-z0-9.:/_~?=#]+', -1, 0x00000400)
+        self.uri_tag = self.match_add_regex(regex, 0)
+        self.match_set_cursor_name(self.uri_tag, "hand")
+
+        self.click = Gtk.GestureMultiPress.new(self)
+        self.click.set_propagation_phase(1)  # constants not defined?
+        self.click.connect('pressed', self.pressed)
+
+    def pressed(self, gesture, times, x, y):
+        if times != 1:
+            return
+
+        event = self.click.get_last_event(gesture.get_last_updated_sequence())
+        uri, tag = self.match_check_event(event)
+        if uri and tag == self.uri_tag:
+            Gtk.show_uri_on_window(self.get_toplevel(), uri, event.time)
 
     @staticmethod
     def parse_color(color):
