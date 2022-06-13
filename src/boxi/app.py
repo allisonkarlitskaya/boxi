@@ -21,6 +21,7 @@ import signal
 import socket
 import subprocess
 import sys
+import urllib.parse
 
 import gi
 
@@ -167,10 +168,6 @@ class Window(Gtk.ApplicationWindow):
         super().__init__(application=application)
         self.command_line = command_line
         header = Gtk.HeaderBar()
-        if application.container:
-            header.set_title(f'Boxi ({application.container})')
-        else:
-            header.set_title(f'Boxi')
         header.set_show_close_button(True)
         self.set_titlebar(header)
         self.terminal = Terminal()
@@ -185,6 +182,18 @@ class Window(Gtk.ApplicationWindow):
             ('paste', self.paste),
             ('zoom', self.zoom, 's'),
         ])
+
+        self.terminal.connect('current-directory-uri-changed', self.update_cwd)
+        self.terminal.connect('current-file-uri-changed', self.update_cwd)
+        self.update_cwd()
+
+    def update_cwd(self, *args):
+        cwd_uri = self.terminal.get_current_directory_uri()
+        self.cwd = cwd_uri and urllib.parse.urlparse(cwd_uri).path
+        file_uri = self.terminal.get_current_file_uri()
+        self.file = file_uri and urllib.parse.urlparse(file_uri).path
+        title = ['Boxi', self.get_application().container, self.file or self.cwd]
+        self.set_title(' : '.join(text for text in title if text))
 
     def session_created(self, pty):
         self.terminal.set_pty(pty)
