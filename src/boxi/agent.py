@@ -20,6 +20,7 @@ import json
 import os
 import pty
 import pwd
+import shutil
 import socket
 import subprocess
 import termios
@@ -42,6 +43,10 @@ class Session(threading.Thread):
                 args = [pwd.getpwuid(os.getuid()).pw_shell]
             except (OSError, KeyError):
                 args = ['/bin/sh']
+        elif args[0] == '_PAGER':
+            args[0] = shutil.which('nvim') or shutil.which('vim') or shutil.which('less') or 'more'
+        elif args[0] == '_EDITOR':
+            args[0] = os.environ.get('EDITOR') or shutil.which('nvim') or shutil.which('vim') or 'vi'
 
         theirs, ours = pty.openpty()
         socket.send_fds(self.connection, [b'"pty"'], [theirs])

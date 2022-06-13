@@ -95,7 +95,7 @@ class Session:
 
     def open_editor(self):
         reader, writer = os.pipe()
-        self.start_command(['vi', '-'], fds=[reader])
+        self.start_command(['_PAGER', '-'], fds=[reader])
         return Gio.UnixOutputStream.new(writer, True)
 
     @staticmethod
@@ -331,7 +331,7 @@ class Application(Gtk.Application):
                 break
         else:
             window = Window(self, path=path)
-            window.session.start_command(['vi', path])
+            window.session.start_command(['_EDITOR', path])
             window.show_all()
 
         window.present()
