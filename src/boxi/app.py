@@ -236,6 +236,7 @@ class Application(Gtk.Application):
     def __init__(self):
         super().__init__(flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
 
+        self.add_option('non-unique', description='Disable GApplication uniqueness')
         self.add_option('version', description='Show version')
         self.add_option('container', 'c', arg=GLib.OptionArg.STRING, description='Toolbox container name')
         self.add_option('', arg=GLib.OptionArg.STRING_ARRAY, arg_description='COMMAND ARGS ...')
@@ -266,7 +267,9 @@ class Application(Gtk.Application):
         # consistent commandline behaviour) opportunistically, without breaking
         # the partially-installed case.
         flags = self.get_flags()
-        if not flags & Gio.ApplicationFlags.IS_SERVICE:
+        if options.contains('non-unique'):
+            self.set_flags(flags | Gio.ApplicationFlags.NON_UNIQUE)
+        elif not flags & Gio.ApplicationFlags.IS_SERVICE:
             try:
                 self.set_flags(flags | Gio.ApplicationFlags.IS_LAUNCHER)
                 self.register()
