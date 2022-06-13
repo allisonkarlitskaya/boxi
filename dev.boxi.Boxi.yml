@@ -1,0 +1,40 @@
+#!/usr/bin/env -S flatpak-builder --user --install --force-clean tmp
+
+app-id: dev.boxi.Boxi
+runtime: org.gnome.Platform
+runtime-version: '42'
+sdk: org.gnome.Sdk
+
+build-options:
+  build-args:
+    - --share=network
+
+modules:
+  - name: vte
+    sources:
+      - type: git
+        url: https://gitlab.gnome.org/GNOME/vte
+        tag: 0.68.0
+        commit: 0f438924f9f8a858b1b82434c876e31c2de180d4
+    buildsystem: meson
+
+  - name: boxi
+    sources:
+      - type: git
+        url: .
+        branch: HEAD
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app --no-deps .
+      - mv /app/share/dbus-1/services/dev.boxi.service /app/share/dbus-1/services/dev.boxi.Boxi.service
+      - sed -i 's/dev.boxi/dev.boxi.Boxi/' /app/share/dbus-1/services/dev.boxi.Boxi.service
+
+rename-desktop-file: dev.boxi.desktop
+command: boxi
+
+finish-args:
+  - --talk-name=org.freedesktop.Flatpak
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --share=ipc

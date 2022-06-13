@@ -1,2 +1,4 @@
+/.flatpak-builder/
+/tmp/
 /dist/
 __pycache__
