@@ -19,7 +19,6 @@ import json
 import os
 import signal
 import socket
-import subprocess
 import sys
 import urllib.parse
 
@@ -44,13 +43,6 @@ VTE_ENV = {'TERM': VTE_TERMINFO_NAME, 'VTE_VERSION': f'{VTE_NUMERIC_VERSION}'}
 class Agent:
     def __init__(self, container=None):
         self.container = container
-        self.connection, theirs = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
-        their_fd = theirs.fileno()
-
-        def dup2_3_and_close_theirs():
-            assert their_fd != 3  # second parameter of socketpair()?  can't be 3.
-            os.dup2(their_fd, 3)
-            os.close(their_fd)
 
         if container:
             cmd = [sys.executable, f'{PKG_DIR}/toolbox_run.py', container, '--', '/usr/bin/python3']
@@ -65,10 +57,13 @@ class Agent:
         else:
             cmd.extend(['-', 'Boxi agent for host'])
 
-        with open(f'{PKG_DIR}/agent.py', 'rb') as agent_py:
-            subprocess.Popen(cmd, stdin=agent_py, pass_fds=[3], preexec_fn=dup2_3_and_close_theirs)
-
+        launcher = Gio.SubprocessLauncher.new(Gio.SubprocessFlags.NONE)
+        launcher.set_stdin_file_path(f'{PKG_DIR}/agent.py')
+        self.connection, theirs = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
+        launcher.take_fd(os.dup(theirs.fileno()), 3)
         theirs.close()
+
+        launcher.spawnv(cmd)
 
     def create_session(self, listener):
         ours, theirs = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
@@ -345,6 +340,5 @@ class Application(Gtk.Application):
 
 
 def main():
-    signal.signal(signal.SIGCHLD, signal.SIG_IGN)  # because we don't clean up after the agent
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # because KeyboardInterrupt doesn't work with gmain
     sys.exit(Application().run(sys.argv))
