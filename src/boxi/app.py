@@ -226,7 +226,7 @@ class Window(Gtk.ApplicationWindow):
 
     def zoom(self, action, parameter, *_args):
         current = self.terminal.get_font_scale()
-        factors = {'in': current * 1.2, 'default': 1.0, 'out': current * 0.8}
+        factors = {'in': current + 0.2, 'default': 1.0, 'out': current - 0.2}
         self.terminal.set_font_scale(factors[parameter.get_string()])
 
 
