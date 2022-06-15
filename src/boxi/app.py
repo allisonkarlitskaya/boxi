@@ -262,6 +262,7 @@ class Application(Gtk.Application):
         else:
             self.set_application_id(APP_ID)
             self.container = None
+        GLib.set_prgname(self.get_application_id())
 
         # Ideally, GApplication would have a flag for this, but it's a little
         # bit magic.  In case `--gapplication-service` wasn't given, we want to
