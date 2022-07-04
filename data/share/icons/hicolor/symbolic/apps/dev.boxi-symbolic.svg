@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg height="16px" viewBox="0 0 16 16" width="16px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <filter id="a" height="100%" width="100%" x="0%" y="0%">
+        <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/>
+    </filter>
+    <mask id="b">
+        <g filter="url(#a)">
+            <rect fill-opacity="0.75" height="16" width="16"/>
+        </g>
+    </mask>
+    <clipPath id="c">
+        <rect height="152" width="192"/>
+    </clipPath>
+    <mask id="d">
+        <g filter="url(#a)">
+            <rect fill-opacity="0.75" height="16" width="16"/>
+        </g>
+    </mask>
+    <clipPath id="e">
+        <rect height="152" width="192"/>
+    </clipPath>
+    <mask id="f">
+        <g filter="url(#a)">
+            <rect fill-opacity="0.75" height="16" width="16"/>
+        </g>
+    </mask>
+    <clipPath id="g">
+        <rect height="152" width="192"/>
+    </clipPath>
+    <g clip-path="url(#c)" fill="#ffffff" mask="url(#b)" transform="matrix(1 0 0 1 -168 -16)">
+        <path d="m 27.542969 97.242188 l 7.832031 6.6875 l -7.855469 6.710937 l -1.804687 -2.046875 l 5.613281 -4.621094 l -5.65625 -4.640625 z m 0 0"/>
+        <path d="m 48 110 v 2 h -11 v -2 z m 0 0"/>
+    </g>
+    <g clip-path="url(#e)" fill="#ffffff" mask="url(#d)" transform="matrix(1 0 0 1 -168 -16)">
+        <path d="m 82.734375 55.085938 l 7.832031 6.6875 l -7.855468 6.710937 l -1.800782 -2.046875 l 5.609375 -4.621094 l -5.65625 -4.640625 z m 0 0"/>
+        <path d="m 103 68 v 2 h -11 v -2 z m 0 0"/>
+    </g>
+    <g clip-path="url(#g)" fill="#77767b" mask="url(#f)" transform="matrix(1 0 0 1 -168 -16)">
+        <path d="m 27.542969 55.085938 l 7.832031 6.6875 l -7.855469 6.710937 l -1.804687 -2.046875 l 5.613281 -4.621094 l -5.65625 -4.640625 z m 0 0"/>
+        <path d="m 48 68 v 2 h -11 v -2 z m 0 0"/>
+    </g>
+    <path d="m 1.5 2 c -0.832031 0 -1.5 0.667969 -1.5 1.5 v 10 c 0 0.832031 0.667969 1.5 1.5 1.5 h 13 c 0.832031 0 1.5 -0.667969 1.5 -1.5 v -10 c 0 -0.832031 -0.667969 -1.5 -1.5 -1.5 z m 0.5 1 h 5 v 5 h -6 v -4 c 0 -0.554688 0.445312 -1 1 -1 z m 8.335938 0.988281 l 1.417968 1.230469 l -1.421875 1.230469 l -0.324219 -0.375 l 1.011719 -0.847657 l -1.019531 -0.855468 z m -8 0.011719 l -0.335938 0.382812 l 1.011719 0.84375 l -1.003907 0.839844 l 0.324219 0.371094 l 1.40625 -1.21875 z m 1.695312 2.351562 v 0.363282 h 1.96875 v -0.363282 z m 7.980469 0.007813 h 1.988281 v 0.367187 h -1.988281 z m -11.011719 2.640625 h 6 v 5 h -5 c -0.554688 0 -1 -0.445312 -1 -1 z m 1.335938 1 l -0.335938 0.382812 l 1.011719 0.84375 l -1.003907 0.839844 l 0.324219 0.371094 l 1.40625 -1.21875 z m 1.695312 2.324219 v 0.363281 h 1.96875 v -0.363281 z m 0 0"/>
+</svg>
