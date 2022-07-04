@@ -9,7 +9,7 @@ A terminal emulator for use with Toolbox.
 
 This is a thought-experiment app based around the idea of having a terminal emulator running in a separate container from the session inside of it, with the kernel as the only intermediary.
 
-This is accomplished by means of file descriptor passing of the pseudoterminal device from a small "agent" program running on the other side of a container boundary.  The agent is started using the usual container tools (`flatpak-spawn`, `toolbox`, `podman`), but creating a session is done purely via sockets.
+This is accomplished by means of file descriptor passing of the pseudo-terminal device from a small "agent" program running on the other side of a container boundary.  The agent is started using the usual container tools (`flatpak-spawn`, `toolbox`, `podman`), but creating a session is done purely via sockets.
 
 Boxi can be installed via `pip`:
 
@@ -19,7 +19,7 @@ pip install boxi
 
 and will soon be available on Flathub.
 
-The install comes with a `.desktop` file, so Boxi can be launched from the desktop shell.  It can also be launched from the commandline:
+The install comes with a `.desktop` file, so Boxi can be launched from the desktop shell.  It can also be launched from the command line:
 
 ```
 boxi
