@@ -29,6 +29,19 @@ modules:
 
 command: boxi
 
+cleanup:
+  - '/bin/vte-2.91'
+  - '/etc'
+  - '/include'
+  - '/lib/debug'
+  - '/lib/libvte-2.91.so'
+  - '/lib/pkgconfig'
+  - '/lib/systemd'
+  - '/libexec'
+  - '/share/gir-1.0'
+  - '/share/glade'
+  - '/share/vala'
+
 finish-args:
   - --talk-name=org.freedesktop.Flatpak
   - --socket=wayland
