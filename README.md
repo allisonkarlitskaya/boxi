@@ -1,4 +1,7 @@
+<img align="left" width="64" height="64" src="data/share/icons/hicolor/scalable/apps/dev.boxi.svg">
+
 # Boxi
+
 A terminal emulator for use with Toolbox.
 
 This is a thought-experiment app based around the idea of having a terminal emulator running in a separate container from the session inside of it, with the kernel as the only intermediary.

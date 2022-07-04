@@ -30,6 +30,7 @@ modules:
       - sed -i 's/dev.boxi/dev.boxi.Boxi/' /app/share/dbus-1/services/dev.boxi.Boxi.service
 
 rename-desktop-file: dev.boxi.desktop
+rename-icon: dev.boxi
 command: boxi
 
 finish-args:
