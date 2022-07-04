@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Boxi
+Icon=dev.boxi.Boxi
 StartupNotify=true
 DBusActivatable=true
 MimeType=text/plain
