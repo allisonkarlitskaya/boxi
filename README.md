@@ -2,6 +2,7 @@
 
 # Boxi
 
+ - [Boxi on Flathub (recommended way to install)](https://flathub.org/apps/details/dev.boxi.Boxi)
  - [GitHub Project Page](https://github.com/allisonkarlitskaya/boxi/)
  - [PyPI Project Page](https://pypi.org/project/boxi/)
 
@@ -11,13 +12,11 @@ This is a thought-experiment app based around the idea of having a terminal emul
 
 This is accomplished by means of file descriptor passing of the pseudo-terminal device from a small "agent" program running on the other side of a container boundary.  The agent is started using the usual container tools (`flatpak-spawn`, `toolbox`, `podman`), but creating a session is done purely via sockets.
 
-Boxi can be installed via `pip`:
+The recommended way to install Boxi is from Flathub, but it's also possible to install via `pip`:
 
 ```
 pip install boxi
 ```
-
-and will soon be available on Flathub.
 
 The install comes with a `.desktop` file, so Boxi can be launched from the desktop shell.  It can also be launched from the command line:
 
@@ -36,7 +35,7 @@ Boxi uses different application identifiers when it is run for different contain
 ```
 [Desktop Entry]
 Type=Application
-Name=Boxi (f36)
+Name=Fedora 36 (Boxi)
 Icon=fedora
 StartupNotify=true
 Exec=boxi -c f36
