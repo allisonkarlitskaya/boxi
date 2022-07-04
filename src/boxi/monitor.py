@@ -98,7 +98,7 @@ class BoxiDesktopFileManager(ContainerTracker):
     def __init__(self, flatpak=False, appid=None, execbase=None, **kwargs):
         super().__init__(filters=['label=com.github.containers.toolbox=true'], **kwargs)
 
-        self.appid = appid or ('dev.boxi.Boxi' if flatpak else 'dev.boxi')
+        self.appid = appid or 'dev.boxi.Boxi'
         self.execbase = execbase or (f'flatpak run {self.appid}' if flatpak else 'boxi')
 
         xdg_data_home = os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share')
@@ -186,7 +186,7 @@ class BoxiDesktopFileManager(ContainerTracker):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--flatpak', action='store_true', help="Install desktop files for flatpaked Boxi?")
-    parser.add_argument('--appid', required=False, help="Application ID ['dev.boxi' or 'dev.boxi.Boxi' for flatpak]")
+    parser.add_argument('--appid', required=False, help="Application ID [default: 'dev.boxi.Boxi']")
     parser.add_argument('--exec', required=False, help="The prefix for the Exec= line in created desktop files")
     parser.add_argument('--podman', required=False, help="Path to podman [default: 'podman']")
     args = parser.parse_args()

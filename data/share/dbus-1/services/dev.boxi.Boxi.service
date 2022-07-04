@@ -1,3 +1,3 @@
 [D-BUS Service]
-Name=dev.boxi
+Name=dev.boxi.Boxi
 Exec=/usr/bin/env boxi --gapplication-service

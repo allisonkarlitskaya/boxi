@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <component type="desktop-application">
-  <id>dev.boxi</id>
+  <id>dev.boxi.Boxi</id>
 
   <name>Boxi</name>
   <summary>A terminal emulator for use with Toolbox</summary>
@@ -35,7 +35,7 @@
     <release date="2022-07-04" version="3"/>
   </releases>
 
-  <launchable type="desktop-id">dev.boxi.desktop</launchable>
+  <launchable type="desktop-id">dev.boxi.Boxi.desktop</launchable>
 
   <categories>
     <category>System</category>
