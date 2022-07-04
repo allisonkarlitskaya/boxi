@@ -2,6 +2,9 @@
 
 # Boxi
 
+ - [GitHub Project Page](https://github.com/allisonkarlitskaya/boxi/)
+ - [PyPI Project Page](https://pypi.org/project/boxi/)
+
 A terminal emulator for use with Toolbox.
 
 This is a thought-experiment app based around the idea of having a terminal emulator running in a separate container from the session inside of it, with the kernel as the only intermediary.
