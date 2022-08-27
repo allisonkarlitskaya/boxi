@@ -282,7 +282,8 @@ class Application(Gtk.Application):
     def do_startup(self):
         Gtk.Application.do_startup(self)
 
-        Handy.StyleManager.get_default().set_color_scheme(Handy.ColorScheme.PREFER_LIGHT)
+        settings = Gio.Settings('dev.boxi.Boxi')
+        settings.bind('color-scheme', Handy.StyleManager.get_default(), 'color-scheme', Gio.SettingsBindFlags.GET)
 
         self.set_accels_for_action("win.new-window", ["<Ctrl><Shift>N"])
         self.set_accels_for_action("win.edit-contents", ["<Ctrl><Shift>S"])

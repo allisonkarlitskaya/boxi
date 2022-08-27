@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="dev.boxi.Boxi" path="/dev/boxi/Boxi/">
+    <key name="color-scheme" type="s">
+      <default>'default'</default>
+      <choices>
+        <choice value='default'/>
+        <choice value='force-light'/>
+        <choice value='prefer-light'/>
+        <choice value='prefer-dark'/>
+        <choice value='force-dark'/>
+      </choices>
+    </key>
+  </schema>
+</schemalist>
