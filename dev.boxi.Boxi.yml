@@ -9,7 +9,7 @@ modules:
   - name: vte
     sources:
       - type: git
-        url: https://gitlab.gnome.org/GNOME/vte
+        url: https://gitlab.gnome.org/GNOME/vte.git/
         tag: 0.68.0
         commit: 0f438924f9f8a858b1b82434c876e31c2de180d4
     buildsystem: meson
