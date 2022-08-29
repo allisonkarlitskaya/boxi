@@ -18,6 +18,13 @@ The recommended way to install Boxi is from Flathub, but it's also possible to i
 pip install boxi
 ```
 
+Note that after installing Boxi this way, you'll need to manually compile the GSettings schema file:
+
+```
+glib-compile-schemas ~/.local/share/glib-2.0/schemas/
+
+```
+
 The install comes with a `.desktop` file, so Boxi can be launched from the desktop shell.  It can also be launched from the command line:
 
 ```
