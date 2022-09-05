@@ -10,8 +10,7 @@ modules:
     sources:
       - type: git
         url: https://gitlab.gnome.org/GNOME/vte.git/
-        tag: 0.69.99
-        commit: 768acd1c0a8bd11b9b9fc2be78d8a3159ecef32b
+        commit: fb604fe287abf64645a83ef27e2c05da14fbbae0
     buildsystem: meson
     config-opts:
       - -Dgtk3=false
