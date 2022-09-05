@@ -36,10 +36,13 @@ cleanup:
   - '/lib/debug'
   - '/lib/libvte-2.91-gtk4.so'
   - '/lib/pkgconfig'
+  - '/lib/python*/site-packages/*.dist-info'
   - '/lib/systemd'
   - '/libexec'
   - '/share/gir-1.0'
   - '/share/glade'
+  - '/share/locale'
+  - '/share/runtime'
   - '/share/vala'
 
 finish-args:
