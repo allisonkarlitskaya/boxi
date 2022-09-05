@@ -24,13 +24,13 @@ import urllib.parse
 
 import gi
 
-gi.require_version('Handy', '1')
-gi.require_version('Gdk', '3.0')
-gi.require_version('Gtk', '3.0')
-gi.require_version('Vte', '2.91')
+gi.require_version('Adw', '1')
+gi.require_version('Gdk', '4.0')
+gi.require_version('Gtk', '4.0')
+gi.require_version('Vte', '3.91')
 
 from gi.repository import GLib
-from gi.repository import Gdk, Gio, Gtk, Handy, Vte
+from gi.repository import Adw, Gdk, Gio, Gtk, Vte
 
 from .adwaita_palette import ADWAITA_PALETTE
 from . import APP_ID, IS_FLATPAK, PKG_DIR
@@ -122,18 +122,22 @@ class Terminal(Vte.Terminal):
         self.uri_tag = self.match_add_regex(regex, 0)
         self.match_set_cursor_name(self.uri_tag, "hand")
 
-        self.click = Gtk.GestureMultiPress.new(self)
-        self.click.set_propagation_phase(1)  # constants not defined?
-        self.click.connect('pressed', self.pressed)
+        click = Gtk.GestureClick.new()
+        click.set_propagation_phase(1)  # constants not defined?
+        click.connect('pressed', self.pressed)
+        self.add_controller(click)
+
+        style_manager = Adw.StyleManager.get_default()
+        style_manager.connect_object('notify::dark', Terminal.dark_changed, self)
+        self.dark_changed(self)
 
     def pressed(self, gesture, times, x, y):
         if times != 1:
             return
 
-        event = self.click.get_last_event(gesture.get_last_updated_sequence())
-        uri, tag = self.match_check_event(event)
-        if uri and tag == self.uri_tag:
-            Gtk.show_uri_on_window(self.get_toplevel(), uri, event.time)
+        uri, tag = self.check_match_at(x, y)
+        if tag == self.uri_tag and uri is not None:
+            Gtk.show_uri(self.get_root(), uri, gesture.get_current_event_time())
 
     @staticmethod
     def parse_color(color):
@@ -146,13 +150,14 @@ class Terminal(Vte.Terminal):
                         bg and Terminal.parse_color(bg),
                         [Terminal.parse_color(color) for color in palette])
 
-    def do_style_updated(self):
+    @staticmethod
+    def dark_changed(self, _param=None):
         # See https://gitlab.gnome.org/Teams/Design/hig-www/-/issues/129 and
         # https://gitlab.gnome.org/Teams/Design/HIG-app-icons/-/commit/4e1dfe95748a6ee80cc9c0e6c40a891c0f4d534c
         palette = ['dark_4', 'red_4', 'green_4', 'yellow_4', 'blue_4', 'purple_4', '#0aa8dc', 'light_4',
                    'dark_2', 'red_2', 'green_2', 'yellow_2', 'blue_2', 'purple_2', '#4fd2fd', 'light_2']
 
-        if Handy.StyleManager.get_default().get_dark():
+        if Adw.StyleManager.get_default().get_dark():
             self.set_palette('light_1', 'rgb(5%, 5%, 5%)', palette)
         else:
             self.set_palette('dark_5', 'light_1', palette)
@@ -163,12 +168,11 @@ class Window(Gtk.ApplicationWindow):
         super().__init__(application=application)
         self.command_line = command_line
         header = Gtk.HeaderBar()
-        header.set_show_close_button(True)
         self.set_titlebar(header)
         self.terminal = Terminal()
         self.terminal.set_size(120, 48)
         self.session = application.agent.create_session(self)
-        self.add(self.terminal)
+        self.set_child(self.terminal)
         self.terminal.connect('eof', self.session_eof)
         self.file = None
         self.path = path
@@ -208,11 +212,11 @@ class Window(Gtk.ApplicationWindow):
     def new_window(self, *_args):
         window = Window(self.get_application())
         window.session.start_shell(cwd=self.cwd or self.path and os.path.dirname(self.path))
-        window.show_all()
+        window.show()
 
     def edit_contents(self, *_args):
         window = Window(self.get_application())
-        window.show_all()
+        window.show()
 
         stream = window.session.open_editor()
         self.terminal.write_contents_sync(stream, Vte.WriteFlags.DEFAULT, None)
@@ -283,7 +287,7 @@ class Application(Gtk.Application):
         Gtk.Application.do_startup(self)
 
         settings = Gio.Settings('dev.boxi.Boxi')
-        settings.bind('color-scheme', Handy.StyleManager.get_default(), 'color-scheme', Gio.SettingsBindFlags.GET)
+        settings.bind('color-scheme', Adw.StyleManager.get_default(), 'color-scheme', Gio.SettingsBindFlags.GET)
 
         self.set_accels_for_action("win.new-window", ["<Ctrl><Shift>N"])
         self.set_accels_for_action("win.edit-contents", ["<Ctrl><Shift>S"])
@@ -313,7 +317,7 @@ class Application(Gtk.Application):
                 window.session.start_command(args.get_strv())
             else:
                 window.session.start_shell()
-            window.show_all()
+            window.show()
 
             return -1  # real return value comes later
 
@@ -329,7 +333,7 @@ class Application(Gtk.Application):
         else:
             window = Window(self, path=path)
             window.session.start_command(['_EDITOR', path])
-            window.show_all()
+            window.show()
 
         window.present()
 
@@ -337,7 +341,7 @@ class Application(Gtk.Application):
     def do_activate(self):
         window = Window(self)
         window.session.start_shell()
-        window.show_all()
+        window.show()
 
 
 def main():

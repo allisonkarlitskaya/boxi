@@ -10,9 +10,12 @@ modules:
     sources:
       - type: git
         url: https://gitlab.gnome.org/GNOME/vte.git/
-        tag: 0.68.0
-        commit: 0f438924f9f8a858b1b82434c876e31c2de180d4
+        tag: 0.69.99
+        commit: 768acd1c0a8bd11b9b9fc2be78d8a3159ecef32b
     buildsystem: meson
+    config-opts:
+      - -Dgtk3=false
+      - -Dgtk4=true
 
   - name: python3-flit_core
     sources:
@@ -36,11 +39,11 @@ modules:
 command: boxi
 
 cleanup:
-  - '/bin/vte-2.91'
+  - '/bin/vte-2.91-gtk4'
   - '/etc'
   - '/include'
   - '/lib/debug'
-  - '/lib/libvte-2.91.so'
+  - '/lib/libvte-2.91-gtk4.so'
   - '/lib/pkgconfig'
   - '/lib/python3.*/site-packages/flit_core*'
   - '/lib/systemd'
