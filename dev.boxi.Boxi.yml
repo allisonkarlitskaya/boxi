@@ -2,7 +2,7 @@
 
 app-id: dev.boxi.Boxi
 runtime: org.gnome.Platform
-runtime-version: '42'
+runtime-version: '43beta'
 sdk: org.gnome.Sdk
 
 modules:
@@ -16,15 +16,6 @@ modules:
     config-opts:
       - -Dgtk3=false
       - -Dgtk4=true
-
-  - name: python3-flit_core
-    sources:
-      - type: file
-        url: https://files.pythonhosted.org/packages/ad/38/80992c4cb490a05474c886850ec818276d09c0a6722bd5b43bc487818ac7/flit_core-3.7.1-py3-none-any.whl
-        sha256: e454fdbf68c7036e1c7435ec7479383f9d9a1650ca5b304feb184eba1efcdcef
-    buildsystem: simple
-    build-commands:
-      - pip3 install --no-build-isolation --prefix=/app flit_core-3.7.1-py3-none-any.whl
 
   - name: boxi
     sources:
@@ -45,7 +36,6 @@ cleanup:
   - '/lib/debug'
   - '/lib/libvte-2.91-gtk4.so'
   - '/lib/pkgconfig'
-  - '/lib/python3.*/site-packages/flit_core*'
   - '/lib/systemd'
   - '/libexec'
   - '/share/gir-1.0'

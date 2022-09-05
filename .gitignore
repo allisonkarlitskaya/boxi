@@ -1,4 +1,6 @@
 /.flatpak-builder/
-/tmp/
+/build/
 /dist/
+/src/boxi.egg-info/
+/tmp/
 __pycache__

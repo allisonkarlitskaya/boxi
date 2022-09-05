@@ -1,20 +1,29 @@
 [build-system]
-requires = ["flit_core >=3.7,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools >= 61"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "boxi"
+description = "A terminal emulator for use with Toolbox"
 authors = [{name = "Allison Karlitskaya", email = "allison.karlitskaya@redhat.com"}]
-readme = "README.md"
 license = {file = "COPYING"}
 classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
-dynamic = ["version", "description"]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "boxi.__version__"}
+readme = {file = ["README.md"]}
+
+[tool.setuptools.data-files]
+"share/applications" = ["data/share/applications/dev.boxi.Boxi.desktop"]
+"share/dbus-1/services" = ["data/share/dbus-1/services/dev.boxi.Boxi.service"]
+"share/glib-2.0/schemas" = ["data/share/glib-2.0/schemas/dev.boxi.gschema.xml"]
+"share/icons/hicolor/scalable/apps" = ["data/share/icons/hicolor/scalable/apps/dev.boxi.Boxi.svg"]
+"share/icons/hicolor/symbolic/apps" = ["data/share/icons/hicolor/symbolic/apps/dev.boxi.Boxi-symbolic.svg"]
+"share/metainfo" = ["data/share/metainfo/dev.boxi.Boxi.metainfo.xml"]
 
 [project.urls]
 Home = "https://github.com/allisonkarlitskaya/boxi/"
 
 [project.scripts]
 boxi = "boxi.app:main"
-
-[tool.flit.external-data]
-directory = "data"
