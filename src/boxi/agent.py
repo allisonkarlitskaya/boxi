@@ -26,13 +26,14 @@ import subprocess
 import termios
 import threading
 
+
 class Session(threading.Thread):
     def __init__(self, connection):
         super().__init__(daemon=True)
         self.connection = connection
 
     def run(self):
-        msg, fds, flags, addr = socket.recv_fds(self.connection, 10000, 1)
+        msg, fds, _flags, _addr = socket.recv_fds(self.connection, 10000, 1)
         message = json.loads(msg)
         args = message.get('args')
         env = message.get('env')
@@ -53,9 +54,9 @@ class Session(threading.Thread):
         os.close(theirs)
 
         result = subprocess.run(args, env=dict(os.environ, **env), cwd=cwd,
-                check=False, start_new_session=True,
-                stdin=fds[0] if fds else ours, stdout=ours, stderr=ours,
-                preexec_fn=lambda: fcntl.ioctl(1, termios.TIOCSCTTY, 0))
+                                check=False, start_new_session=True,
+                                stdin=fds[0] if fds else ours, stdout=ours, stderr=ours,
+                                preexec_fn=lambda: fcntl.ioctl(1, termios.TIOCSCTTY, 0))
 
         self.connection.send(json.dumps(result.returncode).encode('ascii'))
         self.connection.close()

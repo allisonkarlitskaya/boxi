@@ -4,6 +4,7 @@ import os
 
 from boxi import IS_FLATPAK
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('container')

@@ -42,22 +42,24 @@ class ContainerTracker:
         # current list, we don't know if the monitoring was successfully
         # established before our list command ran.  To work around that race,
         # we request all events since 10s ago to be reported.
-        events = await asyncio.create_subprocess_exec(self.podman,
-                'events',
-                '--format=json',
-                '--since=10s',
-                '--filter=type=container',
-                *self.filters,
-                stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.PIPE)
+        events = await asyncio.create_subprocess_exec(
+            self.podman,
+            'events',
+            '--format=json',
+            '--since=10s',
+            '--filter=type=container',
+            *self.filters,
+            stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.PIPE)
 
         # Collect the initial list of containers
-        container_list = await asyncio.create_subprocess_exec(self.podman,
-                'container',
-                'list',
-                '--format=json',
-                '--all',
-                *self.filters,
-                stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.PIPE)
+        container_list = await asyncio.create_subprocess_exec(
+            self.podman,
+            'container',
+            'list',
+            '--format=json',
+            '--all',
+            *self.filters,
+            stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.PIPE)
 
         stdout, _stderr = await container_list.communicate()
         for container in json.loads(stdout):
@@ -113,7 +115,6 @@ class BoxiDesktopFileManager(ContainerTracker):
                 slices = entry.name.rsplit('.', 2)
                 if len(slices) == 3 and slices[0] == self.appid and slices[2] == 'desktop':
                     self.have_files.add(slices[1])
-
 
     def install(self, container):
         if container.startswith('f'):

@@ -22,7 +22,7 @@ from gi.repository import GLib
 from .app import main
 
 if __package__:
-    sys.argv[0] = f'python3 -m boxi'
+    sys.argv[0] = 'python3 -m boxi'
     GLib.set_prgname(sys.argv[0])
 
 main()

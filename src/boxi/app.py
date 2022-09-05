@@ -29,9 +29,7 @@ gi.require_version('Gdk', '4.0')
 gi.require_version('Gtk', '4.0')
 gi.require_version('Vte', '3.91')
 
-from gi.repository import GLib
-from gi.repository import Adw, Gdk, Gio, Gtk, Vte
-
+from gi.repository import GLib, Gio, Gdk, Gtk, Adw, Vte
 from .adwaita_palette import ADWAITA_PALETTE
 from . import APP_ID, IS_FLATPAK, PKG_DIR
 
@@ -174,6 +172,7 @@ class Window(Gtk.ApplicationWindow):
         self.session = application.agent.create_session(self)
         self.set_child(self.terminal)
         self.terminal.connect('eof', self.session_eof)
+        self.container = None
         self.file = None
         self.path = path
         self.cwd = None
@@ -189,7 +188,7 @@ class Window(Gtk.ApplicationWindow):
         self.terminal.connect('current-file-uri-changed', self.update_cwd)
         self.update_cwd()
 
-    def update_cwd(self, *args):
+    def update_cwd(self, *_args):
         cwd_uri = self.terminal.get_current_directory_uri()
         self.cwd = cwd_uri and urllib.parse.urlparse(cwd_uri).path
         file_uri = self.terminal.get_current_file_uri()
@@ -206,7 +205,7 @@ class Window(Gtk.ApplicationWindow):
             del self.command_line
         self.destroy()
 
-    def session_eof(self, terminal):
+    def session_eof(self, _terminal):
         self.destroy()
 
     def new_window(self, *_args):
@@ -228,7 +227,7 @@ class Window(Gtk.ApplicationWindow):
     def paste(self, *_args):
         self.terminal.paste_clipboard()
 
-    def zoom(self, action, parameter, *_args):
+    def zoom(self, _action, parameter, *_args):
         current = self.terminal.get_font_scale()
         factors = {'in': current + 0.2, 'default': 1.0, 'out': current - 0.2}
         self.terminal.set_font_scale(factors[parameter.get_string()])
@@ -244,10 +243,9 @@ class Application(Gtk.Application):
         self.add_option('edit', description='Treat arguments as filenames to edit')
         self.add_option('', arg=GLib.OptionArg.STRING_ARRAY, arg_description='COMMAND ARGS ...')
 
-    def add_option(self, long_name, short_name=None, flags=GLib.OptionFlags.NONE,
-            arg=GLib.OptionArg.NONE, description='', arg_description=None):
+    def add_option(self, long_name, short_name=None, arg=GLib.OptionArg.NONE, description='', arg_description=None):
         short_char = ord(short_name) if short_name is not None else 0
-        self.add_main_option(long_name, short_char, flags, arg, description, arg_description)
+        self.add_main_option(long_name, short_char, GLib.OptionFlags.NONE, arg, description, arg_description)
 
     def do_handle_local_options(self, options):
         if options.contains('version'):
@@ -321,7 +319,7 @@ class Application(Gtk.Application):
 
             return -1  # real return value comes later
 
-    def do_open(self, files, n_files, hint):
+    def do_open(self, files, _n_files, _hint):
         for file in files:
             self.open_file(file)
 
@@ -336,7 +334,6 @@ class Application(Gtk.Application):
             window.show()
 
         window.present()
-
 
     def do_activate(self):
         window = Window(self)
