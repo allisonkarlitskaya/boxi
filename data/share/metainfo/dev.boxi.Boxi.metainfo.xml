@@ -32,6 +32,18 @@
   </screenshots>
 
   <releases>
+    <release date="2022-09-29" version="5">
+      <description>
+        <p>This is the first release of Boxi for GNOME 43.</p>
+        <ul>
+          <li>Port to Gtk 4 and VTE 0.70</li>
+          <li>Fix reference cycles (leaked objects after windows were closed)</li>
+          <li>Support GNOME system monospace font setting</li>
+          <li>Stop using GtkHeaderBar</li>
+        </ul>
+        <p>There is a known issue with startup notification not working properly.</p>
+      </description>
+    </release>
     <release date="2022-08-29" version="4">
       <description>
         <p>This release adds a GSettings key for setting the color scheme.</p>
