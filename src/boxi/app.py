@@ -121,11 +121,13 @@ class Session:
 
 
 class Terminal(Vte.Terminal):
+    URL_REGEX = r'https?://[-A-Za-z0-9.:/_~?=#]+'
+
     def __init__(self, application):
         super().__init__()
         self.set_audible_bell(False)
         self.set_scrollback_lines(-1)
-        regex = Vte.Regex.new_for_match(r'https?://[-A-Za-z0-9.:/_~?=#]+', -1, 0x00000400)
+        regex = Vte.Regex.new_for_match(Terminal.URL_REGEX, -1, 0x00000400)
         self.uri_tag = self.match_add_regex(regex, 0)
         self.match_set_cursor_name(self.uri_tag, "hand")
 
