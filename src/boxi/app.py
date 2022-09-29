@@ -35,6 +35,7 @@ from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import Gio
 from gi.repository import Gtk
+from gi.repository import Pango
 from gi.repository import Vte
 
 from .adwaita_palette import ADWAITA_PALETTE
@@ -139,6 +140,9 @@ class Terminal(Vte.Terminal):
         application.style_manager.bind_property('dark',
                                                 self, 'dark',
                                                 GObject.BindingFlags.SYNC_CREATE)
+        application.interface_settings.bind('monospace-font-name',
+                                            self, 'font-name',
+                                            Gio.SettingsBindFlags.GET)
 
     @staticmethod
     def click_gesture_pressed(gesture, times, x, y):
@@ -179,6 +183,13 @@ class Terminal(Vte.Terminal):
         else:
             self.set_palette('dark_5', 'light_1', palette)
 
+    @GObject.Property(type=str)
+    def font_name(self):
+        return self.get_font().to_string()
+
+    @font_name.setter
+    def set_font_name(self, value):
+        self.set_font(Pango.FontDescription.from_string(value))
 
 class Window(Gtk.ApplicationWindow):
     def __init__(self, application, command_line=None, path=None):
@@ -297,6 +308,7 @@ class Application(Gtk.Application):
         Gtk.Application.do_startup(self)
 
         self.style_manager = Adw.StyleManager.get_default()
+        self.interface_settings = Gio.Settings('org.gnome.desktop.interface')
         self.boxi_settings = Gio.Settings('dev.boxi.Boxi')
 
         self.boxi_settings.bind('color-scheme',
