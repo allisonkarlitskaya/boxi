@@ -133,20 +133,23 @@ class Terminal(Vte.Terminal):
 
         click = Gtk.GestureClick.new()
         click.set_propagation_phase(1)  # constants not defined?
-        click.connect('pressed', self.pressed)
+        click.connect('pressed', Terminal.click_gesture_pressed)
         self.add_controller(click)
 
         application.style_manager.bind_property('dark',
                                                 self, 'dark',
                                                 GObject.BindingFlags.SYNC_CREATE)
 
-    def pressed(self, gesture, times, x, y):
+    @staticmethod
+    def click_gesture_pressed(gesture, times, x, y):
         if times != 1:
             return
 
-        uri, tag = self.check_match_at(x, y)
-        if tag == self.uri_tag and uri is not None:
-            Gtk.show_uri(self.get_root(), uri, gesture.get_current_event_time())
+        terminal = gesture.get_widget()
+
+        uri, tag = terminal.check_match_at(x, y)
+        if tag == terminal.uri_tag and uri is not None:
+            Gtk.show_uri(terminal.get_root(), uri, gesture.get_current_event_time())
 
     @staticmethod
     def parse_color(color):
