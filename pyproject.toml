@@ -7,12 +7,12 @@ name = "boxi"
 description = "A terminal emulator for use with Toolbox"
 authors = [{name = "Allison Karlitskaya", email = "allison.karlitskaya@redhat.com"}]
 license = {file = "COPYING"}
+readme = "README.md"
 classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
-dynamic = ["version", "readme"]
+dynamic = ["version"]
 
 [tool.setuptools.dynamic]
 version = {attr = "boxi.__version__"}
-readme = {file = ["README.md"]}
 
 [tool.setuptools.data-files]
 "share/applications" = ["data/share/applications/dev.boxi.Boxi.desktop"]
