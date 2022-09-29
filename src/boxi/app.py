@@ -29,7 +29,13 @@ gi.require_version('Gdk', '4.0')
 gi.require_version('Gtk', '4.0')
 gi.require_version('Vte', '3.91')
 
-from gi.repository import GLib, Gio, Gdk, Gtk, Adw, Vte
+from gi.repository import Adw
+from gi.repository import GLib
+from gi.repository import Gdk
+from gi.repository import Gio
+from gi.repository import Gtk
+from gi.repository import Vte
+
 from .adwaita_palette import ADWAITA_PALETTE
 from . import APP_ID, IS_FLATPAK, PKG_DIR
 
