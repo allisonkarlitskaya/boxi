@@ -202,17 +202,19 @@ class Window(Gtk.ApplicationWindow):
             ('zoom', self.zoom, 's'),
         ])
 
-        self.terminal.connect('current-directory-uri-changed', self.update_cwd)
-        self.terminal.connect('current-file-uri-changed', self.update_cwd)
-        self.update_cwd()
+        self.terminal.connect('current-directory-uri-changed', Window.terminal_update_cwd)
+        self.terminal.connect('current-file-uri-changed', Window.terminal_update_cwd)
+        self.terminal_update_cwd(self.terminal)
 
-    def update_cwd(self, *_args):
-        cwd_uri = self.terminal.get_current_directory_uri()
-        self.cwd = cwd_uri and urllib.parse.urlparse(cwd_uri).path
-        file_uri = self.terminal.get_current_file_uri()
-        self.file = file_uri and urllib.parse.urlparse(file_uri).path
-        title = ['Boxi', self.get_application().container, self.path or self.file or self.cwd]
-        self.set_title(' : '.join(text for text in title if text))
+    @staticmethod
+    def terminal_update_cwd(terminal):
+        window = terminal.get_parent()
+        cwd_uri = terminal.get_current_directory_uri()
+        window.cwd = cwd_uri and urllib.parse.urlparse(cwd_uri).path
+        file_uri = terminal.get_current_file_uri()
+        window.file = file_uri and urllib.parse.urlparse(file_uri).path
+        title = ['Boxi', window.get_application().container, window.path or window.file or window.cwd]
+        window.set_title(' : '.join(text for text in title if text))
 
     def session_created(self, pty):
         self.terminal.set_pty(pty)
