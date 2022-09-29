@@ -1,4 +1,4 @@
-<img align="left" width="64" height="64" src="data/share/icons/hicolor/scalable/apps/dev.boxi.Boxi.svg">
+![](https://raw.githubusercontent.com/allisonkarlitskaya/boxi/4/data/share/icons/hicolor/scalable/apps/dev.boxi.Boxi.svg)
 
 # Boxi
 
@@ -22,7 +22,6 @@ Note that after installing Boxi this way, you'll need to manually compile the GS
 
 ```
 glib-compile-schemas ~/.local/share/glib-2.0/schemas/
-
 ```
 
 The install comes with a `.desktop` file, so Boxi can be launched from the desktop shell.  It can also be launched from the command line:
