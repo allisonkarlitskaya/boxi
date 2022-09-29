@@ -31,6 +31,7 @@ gi.require_version('Vte', '3.91')
 
 from gi.repository import Adw
 from gi.repository import GLib
+from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import Gio
 from gi.repository import Gtk
@@ -118,7 +119,7 @@ class Session:
 
 
 class Terminal(Vte.Terminal):
-    def __init__(self):
+    def __init__(self, application):
         super().__init__()
         self.set_audible_bell(False)
         self.set_scrollback_lines(-1)
@@ -131,9 +132,9 @@ class Terminal(Vte.Terminal):
         click.connect('pressed', self.pressed)
         self.add_controller(click)
 
-        style_manager = Adw.StyleManager.get_default()
-        style_manager.connect_object('notify::dark', Terminal.dark_changed, self)
-        self.dark_changed(self)
+        application.style_manager.bind_property('dark',
+                                                self, 'dark',
+                                                GObject.BindingFlags.SYNC_CREATE)
 
     def pressed(self, gesture, times, x, y):
         if times != 1:
@@ -154,14 +155,19 @@ class Terminal(Vte.Terminal):
                         bg and Terminal.parse_color(bg),
                         [Terminal.parse_color(color) for color in palette])
 
-    @staticmethod
-    def dark_changed(self, _param=None):
+    @GObject.Property(type=bool, default=False)
+    def dark(self):
+        return self._dark
+
+    @dark.setter
+    def set_dark(self, value):
+        self._dark = value
         # See https://gitlab.gnome.org/Teams/Design/hig-www/-/issues/129 and
         # https://gitlab.gnome.org/Teams/Design/HIG-app-icons/-/commit/4e1dfe95748a6ee80cc9c0e6c40a891c0f4d534c
         palette = ['dark_4', 'red_4', 'green_4', 'yellow_4', 'blue_4', 'purple_4', '#0aa8dc', 'light_4',
                    'dark_2', 'red_2', 'green_2', 'yellow_2', 'blue_2', 'purple_2', '#4fd2fd', 'light_2']
 
-        if Adw.StyleManager.get_default().get_dark():
+        if self._dark:
             self.set_palette('light_1', 'rgb(5%, 5%, 5%)', palette)
         else:
             self.set_palette('dark_5', 'light_1', palette)
@@ -173,7 +179,7 @@ class Window(Gtk.ApplicationWindow):
         self.command_line = command_line
         header = Gtk.HeaderBar()
         self.set_titlebar(header)
-        self.terminal = Terminal()
+        self.terminal = Terminal(application)
         self.terminal.set_size(120, 48)
         self.session = application.agent.create_session(self)
         self.set_child(self.terminal)
@@ -290,8 +296,12 @@ class Application(Gtk.Application):
     def do_startup(self):
         Gtk.Application.do_startup(self)
 
-        settings = Gio.Settings('dev.boxi.Boxi')
-        settings.bind('color-scheme', Adw.StyleManager.get_default(), 'color-scheme', Gio.SettingsBindFlags.GET)
+        self.style_manager = Adw.StyleManager.get_default()
+        self.boxi_settings = Gio.Settings('dev.boxi.Boxi')
+
+        self.boxi_settings.bind('color-scheme',
+                                Adw.StyleManager.get_default(), 'color-scheme',
+                                Gio.SettingsBindFlags.GET)
 
         self.set_accels_for_action("win.new-window", ["<Ctrl><Shift>N"])
         self.set_accels_for_action("win.edit-contents", ["<Ctrl><Shift>S"])
