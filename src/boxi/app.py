@@ -195,8 +195,6 @@ class Window(Gtk.ApplicationWindow):
     def __init__(self, application, command_line=None, path=None):
         super().__init__(application=application)
         self.command_line = command_line
-        header = Gtk.HeaderBar()
-        self.set_titlebar(header)
         self.terminal = Terminal(application)
         self.terminal.set_size(120, 48)
         self.session = application.agent.create_session(self)
