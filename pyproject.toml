@@ -8,7 +8,7 @@ description = "A terminal emulator for use with Toolbox"
 authors = [{name = "Allison Karlitskaya", email = "allison.karlitskaya@redhat.com"}]
 license = {file = "COPYING"}
 classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
-dynamic = ["version"]
+dynamic = ["version", "readme"]
 
 [tool.setuptools.dynamic]
 version = {attr = "boxi.__version__"}
