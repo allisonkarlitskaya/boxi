@@ -19,7 +19,7 @@
 
 import os
 
-__version__ = "4"
+__version__ = "5"
 
 IS_FLATPAK = os.path.exists('/.flatpak-info')
 APP_ID = IS_FLATPAK and os.environ.get('FLATPAK_ID') or 'dev.boxi.Boxi'
