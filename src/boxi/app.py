@@ -102,7 +102,9 @@ class Session:
     def ready(fd, _condition, self):
         msg, fds, _flags, _addr = socket.recv_fds(self.connection, 10000, 1)
         if not msg:
-            self.listener.session_eof(None)
+            self.listener.session_closed()
+            self.connection.close()
+            del self.listener
             return False
 
         message = json.loads(msg)
@@ -183,7 +185,6 @@ class Window(Gtk.ApplicationWindow):
         self.terminal.set_size(120, 48)
         self.session = application.agent.create_session(self)
         self.set_child(self.terminal)
-        self.terminal.connect('eof', self.session_eof)
         self.container = None
         self.file = None
         self.path = path
@@ -215,9 +216,8 @@ class Window(Gtk.ApplicationWindow):
         if hasattr(self, 'command_line') and self.command_line:
             self.command_line.set_exit_status(returncode)
             del self.command_line
-        self.destroy()
 
-    def session_eof(self, _terminal):
+    def session_closed(self):
         self.destroy()
 
     def new_window(self, *_args):
