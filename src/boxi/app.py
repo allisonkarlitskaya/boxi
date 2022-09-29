@@ -306,8 +306,8 @@ class Application(Gtk.Application):
         Gtk.Application.do_startup(self)
 
         self.style_manager = Adw.StyleManager.get_default()
-        self.interface_settings = Gio.Settings('org.gnome.desktop.interface')
-        self.boxi_settings = Gio.Settings('dev.boxi.Boxi')
+        self.interface_settings = Gio.Settings(schema_id='org.gnome.desktop.interface')
+        self.boxi_settings = Gio.Settings(schema_id='dev.boxi.Boxi')
 
         self.boxi_settings.bind('color-scheme',
                                 Adw.StyleManager.get_default(), 'color-scheme',
