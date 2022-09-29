@@ -2,7 +2,7 @@
 
 app-id: dev.boxi.Boxi
 runtime: org.gnome.Platform
-runtime-version: '43beta'
+runtime-version: '43'
 sdk: org.gnome.Sdk
 
 modules:
@@ -10,7 +10,7 @@ modules:
     sources:
       - type: git
         url: https://gitlab.gnome.org/GNOME/vte.git/
-        commit: fb604fe287abf64645a83ef27e2c05da14fbbae0
+        commit: 5bf476f1d7283bc805ac8ae6abe94f81ffd7be05
     buildsystem: meson
     config-opts:
       - -Dgtk3=false
