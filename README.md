@@ -1,4 +1,4 @@
-<img align="left" width="64" height="64" src="data/share/icons/hicolor/scalable/apps/dev.boxi.Boxi.svg">
+![](https://raw.githubusercontent.com/allisonkarlitskaya/boxi/main/data/share/icons/hicolor/scalable/apps/dev.boxi.Boxi.svg)
 
 # Boxi
 
