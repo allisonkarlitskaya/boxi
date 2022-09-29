@@ -194,13 +194,6 @@ class Window(Gtk.ApplicationWindow):
         self.file = None
         self.path = path
         self.cwd = None
-        Gio.ActionMap.add_action_entries(self, [
-            ('new-window', self.new_window),
-            ('edit-contents', self.edit_contents),
-            ('copy', self.copy),
-            ('paste', self.paste),
-            ('zoom', self.zoom, 's'),
-        ])
 
         self.terminal.connect('current-directory-uri-changed', Window.terminal_update_cwd)
         self.terminal.connect('current-file-uri-changed', Window.terminal_update_cwd)
@@ -309,6 +302,12 @@ class Application(Gtk.Application):
         self.boxi_settings.bind('color-scheme',
                                 Adw.StyleManager.get_default(), 'color-scheme',
                                 Gio.SettingsBindFlags.GET)
+
+        Window.install_action('win.new-window', None, Window.new_window)
+        Window.install_action('win.edit-contents', None, Window.edit_contents)
+        Window.install_action('win.copy', None, Window.copy)
+        Window.install_action('win.paste', None, Window.paste)
+        Window.install_action('win.zoom', 's', Window.zoom)
 
         self.set_accels_for_action("win.new-window", ["<Ctrl><Shift>N"])
         self.set_accels_for_action("win.edit-contents", ["<Ctrl><Shift>S"])
