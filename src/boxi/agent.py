@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import array
 import fcntl
 import json
 import os
@@ -27,13 +28,26 @@ import termios
 import threading
 
 
+def recv_fds(sock, bufsize, maxfds, flags=0):
+    fds = array.array("i")
+    msg, ancdata, flags, addr = sock.recvmsg(bufsize, socket.CMSG_LEN(maxfds * fds.itemsize))
+    for cmsg_level, cmsg_type, cmsg_data in ancdata:
+        if (cmsg_level == socket.SOL_SOCKET and cmsg_type == socket.SCM_RIGHTS):
+            fds.frombytes(cmsg_data[:len(cmsg_data) - (len(cmsg_data) % fds.itemsize)])
+    return msg, list(fds), flags, addr
+
+
+def send_fds(sock, buffers, fds, flags=0, address=None):
+    return sock.sendmsg(buffers, [(socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", fds))])
+
+
 class Session(threading.Thread):
     def __init__(self, connection):
         super().__init__(daemon=True)
         self.connection = connection
 
     def run(self):
-        msg, fds, _flags, _addr = socket.recv_fds(self.connection, 10000, 1)
+        msg, fds, _flags, _addr = recv_fds(self.connection, 10000, 1)
         message = json.loads(msg)
         args = message.get('args')
         env = message.get('env')
@@ -50,7 +64,7 @@ class Session(threading.Thread):
             args[0] = os.environ.get('EDITOR') or shutil.which('nvim') or shutil.which('vim') or 'vi'
 
         theirs, ours = pty.openpty()
-        socket.send_fds(self.connection, [b'"pty"'], [theirs])
+        send_fds(self.connection, [b'"pty"'], [theirs])
         os.close(theirs)
 
         result = subprocess.run(args, env=dict(os.environ, **env), cwd=cwd,
@@ -72,7 +86,7 @@ def socket_from_fd(fd):
 
 
 def accept(listener):
-    _msg, fds, _flags, _addr = socket.recv_fds(listener, 1, 1)
+    _msg, fds, _flags, _addr = recv_fds(listener, 1, 1)
     if not fds:
         return None
     fd, = fds
@@ -101,7 +115,10 @@ def main():
 
     listener = socket_from_fd(3)
 
-    while connection := accept(listener):
+    while True:
+        connection = accept(listener)
+        if connection is None:
+            break
         Session(connection).start()
 
 
