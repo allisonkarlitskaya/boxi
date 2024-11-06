@@ -2,7 +2,7 @@
 
 app-id: dev.boxi.Boxi
 runtime: org.gnome.Platform
-runtime-version: '43'
+runtime-version: '47'
 sdk: org.gnome.Sdk
 
 modules:
@@ -32,7 +32,6 @@ cleanup:
   - '/bin/vte-2.91-gtk4'
   - '/etc'
   - '/include'
-  - '/lib/debug'
   - '/lib/libvte-2.91-gtk4.so'
   - '/lib/pkgconfig'
   - '/lib/python*/site-packages/*.dist-info'
@@ -46,5 +45,7 @@ cleanup:
 
 finish-args:
   - --talk-name=org.freedesktop.Flatpak
+  - --share=ipc
   - --socket=wayland
+  - --socket=fallback-x11
   - --device=dri
