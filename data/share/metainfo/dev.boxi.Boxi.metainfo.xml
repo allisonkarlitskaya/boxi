@@ -63,14 +63,17 @@
     <binary>cockpit-client</binary>
   </provides>
 
-  <requires>
+  <recommends>
     <control>keyboard</control>
     <control>pointing</control>
-    <display_length compare="ge">medium</display_length>
-  </requires>
+    <display_length compare="ge">320</display_length>
+  </recommends>
 
-  <content_rating type="oars-1.0"/>
+  <content_rating type="oars-1.1"/>
+
+  <developer_name>Allison Karlitskaya</developer_name>
 
   <url type="homepage">https://boxi.dev/</url>
   <url type="bugtracker">https://github.com/allisonkarlitskaya/boxi/issues</url>
+  <url type="vcs-browser">https://github.com/allisonkarlitskaya/boxi</url>
 </component>
