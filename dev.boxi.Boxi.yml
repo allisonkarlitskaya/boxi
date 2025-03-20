@@ -2,15 +2,21 @@
 
 app-id: dev.boxi.Boxi
 runtime: org.gnome.Platform
-runtime-version: '47'
+runtime-version: '48'
 sdk: org.gnome.Sdk
 
 modules:
+  - name: fast_float
+    buildsystem: cmake-ninja
+    sources:
+      - type: git
+        url: https://github.com/fastfloat/fast_float.git
+        branch: 50a80a73ab2ab256ba1c3bf86923ddd8b4202bc7
   - name: vte
     sources:
       - type: archive
-        url: https://download.gnome.org/sources/vte/0.70/vte-0.70.1.tar.xz
-        sha256: 1f4601cbfea5302b96902208c8f185e5b18b259b5358bc93cf392bf59871c5b6
+        url: https://download.gnome.org/sources/vte/0.80/vte-0.80.0.tar.xz
+        sha256: 267f63739765e568cf8113d0e2ee8f593028946187854bebe268c778e62647c8
     buildsystem: meson
     config-opts:
       - -Dgtk3=false
@@ -30,6 +36,8 @@ command: boxi
 
 cleanup:
   - '/bin/vte-2.91-gtk4'
+  - '/share/applications/org.gnome.Vte.App.Gtk4.desktop'
+  - '/share/xdg-terminals/org.gnome.Vte.App.Gtk4.desktop'
   - '/etc'
   - '/include'
   - '/lib/libvte-2.91-gtk4.so'
