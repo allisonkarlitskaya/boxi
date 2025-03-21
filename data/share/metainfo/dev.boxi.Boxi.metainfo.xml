@@ -3,10 +3,15 @@
   <id>dev.boxi.Boxi</id>
 
   <name>Boxi</name>
-  <summary>A terminal emulator for use with Toolbox</summary>
+  <summary>Terminal emulator for Toolbox</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#32cc53</color>
+    <color type="primary" scheme_preference="dark">#573c26</color>
+  </branding>
 
   <description>
     <p>
@@ -22,11 +27,15 @@
 
   <screenshots>
     <screenshot type="default">
-      <caption>Boxi Terminal Emulator</caption>
+      <caption>Opens directly in your Toolbox</caption>
+      <image>https://boxi.dev/screenshots/main.png</image>
+    </screenshot>
+    <screenshot type="default">
+      <caption>Dark mode following desktop style</caption>
       <image>https://boxi.dev/screenshots/darkmode.png</image>
     </screenshot>
     <screenshot>
-      <caption>GNOME Shell Search Results</caption>
+      <caption>GNOME Shell search results</caption>
       <image>https://boxi.dev/screenshots/search.png</image>
     </screenshot>
   </screenshots>
@@ -76,7 +85,9 @@
 
   <content_rating type="oars-1.1"/>
 
-  <developer_name>Allison Karlitskaya</developer_name>
+  <developer id='dev.boxi'>
+    <name>Allison Karlitskaya</name>
+  </developer>
 
   <url type="homepage">https://boxi.dev/</url>
   <url type="bugtracker">https://github.com/allisonkarlitskaya/boxi/issues</url>
