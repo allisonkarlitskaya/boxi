@@ -11,7 +11,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/fastfloat/fast_float.git
-        branch: 50a80a73ab2ab256ba1c3bf86923ddd8b4202bc7
+        commit: 50a80a73ab2ab256ba1c3bf86923ddd8b4202bc7
   - name: vte
     sources:
       - type: archive
