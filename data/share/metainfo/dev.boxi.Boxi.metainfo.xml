@@ -41,6 +41,11 @@
   </screenshots>
 
   <releases>
+    <release date="2025-03-22" version="6.1">
+      <description>
+        <p>Appstream data updates to address Flathub warnings.  No functional changes.</p>
+      </description>
+    </release>
     <release date="2025-03-20" version="6">
       <description>
         <p>Updates for GNOME 48 and VTE 0.80.  No functional changes.</p>
